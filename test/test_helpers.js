@@ -17,8 +17,17 @@ before((done) =>{
 
 
 beforeEach((done) => {
-    mongoose.connection.dropCollection("users",(() => {
-        //redy to run the next test
-        done();
- }));
+    const { users, comments, blogposts } = mongoose.connection.collections;
+    // mongoose.connection.dropCollection("users",(() => {
+    //     //redy to run the next test
+    //     done();
+    // }));
+    users.drop(() =>{
+        comments.drop(() => {
+            blogposts.drop(() => {
+                done();
+            });
+        });
+    });
+
 })
