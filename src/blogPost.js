@@ -5,7 +5,7 @@ const BlogPostSchema = new Schema({
     title: String,
     content: String,
     comments: [{
-        type: Schema.Types.Object,
+        type: Schema.Types.ObjectId,
         ref: 'comment'
     }]
 

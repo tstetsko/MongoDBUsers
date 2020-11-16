@@ -14,6 +14,7 @@ describe('Associations', () => {
           joe.blogPosts.push(blogPost);
           blogPost.comments.push(comment);
           comment.user = joe;
+          //console.log('coment:', comment);
          
           Promise.all([joe.save(), blogPost.save(), comment.save()]).then(() => done());
     });
@@ -21,9 +22,32 @@ describe('Associations', () => {
     it('save a relation berween a user and a blogpost', (done) => {
        User.findOne({name: 'Joe'}).populate('blogPosts')
        .then((user) => {
-           console.log(user.blogPosts[0]);
+            //console.log(user.blogPosts[0]);
            assert(user.blogPosts[0].title === 'JS is Great');
            done();
        })
-    })
+    });
+
+    it('save a full relation graph', (done) => {      
+       User.findOne({ name: 'Joe' })
+        .populate({
+            path: 'blogPosts',
+            populate: {
+                path: 'comments',
+                model: 'comment',
+                populate: {
+                    path: 'user',
+                    model: 'user'
+                }
+            }
+        })
+      .then((user) => {
+        assert(user.name === 'Joe');
+        assert(user.blogPosts[0].title === 'JS is Great');
+        assert(user.blogPosts[0].comments[0].content === 'Congrats on great post');
+        assert(user.blogPosts[0].comments[0].user.name === 'Joe');
+
+        done();
+      });
+    });
 });
